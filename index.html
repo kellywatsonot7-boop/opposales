@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2026 双十一优惠报价</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>¥</text></svg>">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { background: #F5F4EF; color: #1A1A1A; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif; font-size: 15px; line-height: 1.5; }
+  body { max-width: 560px; margin: 0 auto; padding-bottom: 180px; }
+
+  /* Header */
+  .hd { background: #0B7A5A; color: #fff; padding: 18px 18px 16px; position: sticky; top: 0; z-index: 10; }
+  .hd h1 { font-size: 18px; font-weight: 700; letter-spacing: .5px; }
+  .hd .meta { font-size: 12px; opacity: .85; margin-top: 4px; }
+
+  /* Tabs */
+  .tabs { display: flex; background: #fff; border-bottom: 1px solid #E8E6DF; position: sticky; top: 62px; z-index: 9; }
+  .tab { flex: 1; text-align: center; padding: 12px 0; font-size: 14px; color: #666; cursor: pointer; border-bottom: 2px solid transparent; font-weight: 500; }
+  .tab.on { color: #0B7A5A; border-bottom-color: #0B7A5A; font-weight: 700; }
+
+  /* Section title */
+  .sec-t { padding: 16px 18px 8px; font-size: 12px; color: #999; font-weight: 500; }
+
+  /* Model chips */
+  .models { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 18px; }
+  .chip { padding: 8px 14px; background: #fff; border: 1px solid #E0DED5; border-radius: 999px; font-size: 13px; cursor: pointer; color: #333; }
+  .chip.on { background: #0B7A5A; color: #fff; border-color: #0B7A5A; font-weight: 600; }
+
+  /* Spec list */
+  .specs { padding: 8px 18px 0; display: flex; flex-direction: column; gap: 8px; }
+  .spec { background: #fff; border: 1.5px solid transparent; border-radius: 12px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: border-color .15s; }
+  .spec.on { border-color: #0B7A5A; background: #F0F7F3; }
+  .spec .name { font-size: 14px; font-weight: 500; }
+  .spec .price { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+  .spec .price .old { font-size: 12px; color: #aaa; text-decoration: line-through; }
+  .spec .price .new { font-size: 18px; font-weight: 800; color: #1A1A1A; font-variant-numeric: tabular-nums; line-height: 1; }
+  .spec .price .new.no-flash { font-size: 16px; }
+  .spec .price .flash-tag { font-size: 11px; color: #fff; background: #E63946; padding: 1px 6px; border-radius: 4px; font-weight: 600; }
+
+  /* Options panel */
+  .opts { margin: 16px 18px 0; background: #fff; border-radius: 12px; padding: 14px; }
+  .opt-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #F0EFE9; }
+  .opt-row:last-child { border-bottom: 0; }
+  .opt-label { font-size: 14px; font-weight: 500; }
+  .opt-hint { font-size: 11px; color: #999; margin-top: 2px; }
+
+  /* Member segmented */
+  .seg { display: flex; background: #F0EFE9; border-radius: 8px; padding: 3px; }
+  .seg button { border: 0; background: transparent; padding: 6px 10px; font-size: 12px; border-radius: 6px; cursor: pointer; color: #666; }
+  .seg button.on { background: #fff; color: #0B7A5A; font-weight: 700; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+
+  /* Toggle */
+  .toggle { width: 46px; height: 26px; background: #D8D6CC; border-radius: 999px; position: relative; cursor: pointer; transition: background .2s; }
+  .toggle.on { background: #0B7A5A; }
+  .toggle::after { content: ''; position: absolute; width: 22px; height: 22px; background: #fff; border-radius: 50%; top: 2px; left: 2px; transition: left .2s; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+  .toggle.on::after { left: 22px; }
+  .toggle.disabled { opacity: .4; pointer-events: none; }
+
+  /* Trade-in input */
+  .ti-input { display: flex; align-items: center; gap: 6px; }
+  .ti-input span { font-size: 14px; color: #666; }
+  .ti-input input { width: 96px; border: 1px solid #E0DED5; border-radius: 8px; padding: 6px 8px; font-size: 16px; text-align: right; font-variant-numeric: tabular-nums; }
+  .ti-btn { background: #0B7A5A; color: #fff; border: 0; padding: 7px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+
+  /* Result bar (sticky bottom) */
+  .result { position: fixed; left: 0; right: 0; bottom: 0; background: #fff; box-shadow: 0 -4px 20px rgba(0,0,0,.08); padding: 12px 18px calc(12px + env(safe-area-inset-bottom)); z-index: 20; }
+  .result-inner { max-width: 560px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+  .result .left .lbl { font-size: 12px; color: #999; }
+  .result .left .val { font-size: 28px; font-weight: 800; color: #E63946; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .result .left .val small { font-size: 14px; font-weight: 600; }
+  .result .left .save { font-size: 11px; color: #0B7A5A; font-weight: 600; margin-top: 2px; }
+  .result .btn { background: #0B7A5A; color: #fff; border: 0; padding: 12px 20px; border-radius: 999px; font-size: 14px; font-weight: 600; cursor: pointer; }
+
+  /* Breakdown */
+  .breakdown { margin: 16px 18px 0; background: #fff; border-radius: 12px; padding: 14px; }
+  .breakdown h3 { font-size: 13px; color: #666; margin-bottom: 8px; font-weight: 600; }
+  .bd-row { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; color: #555; font-variant-numeric: tabular-nums; }
+  .bd-row.deduct { color: #0B7A5A; }
+  .bd-row.total { border-top: 1px dashed #E0DED5; margin-top: 6px; padding-top: 8px; font-weight: 700; color: #1A1A1A; font-size: 14px; }
+
+  /* Perks list */
+  .perks { margin: 16px 18px 0; background: #FFF8E6; border-radius: 12px; padding: 14px; }
+  .perks h3 { font-size: 13px; color: #B8860B; margin-bottom: 8px; font-weight: 700; }
+  .perks ul { list-style: none; }
+  .perks li { font-size: 12.5px; color: #6B5700; padding: 3px 0; padding-left: 16px; position: relative; }
+  .perks li::before { content: '·'; position: absolute; left: 4px; color: #B8860B; font-weight: 700; }
+
+  .foot { padding: 20px 18px 0; font-size: 11px; color: #aaa; text-align: center; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<header class="hd">
+  <h1>2026 双十一优惠报价</h1>
+  <div class="meta">活动期 10.8 – 11.13 · 一线端权益（黄色=会员 / 绿色=学生）</div>
+</header>
+
+<div class="tabs" id="tabs"></div>
+
+<div class="sec-t">选择型号</div>
+<div class="models" id="models"></div>
+
+<div class="sec-t">选择配置</div>
+<div class="specs" id="specs"></div>
+
+<div class="opts">
+  <div class="opt-row">
+    <div>
+      <div class="opt-label">会员身份</div>
+      <div class="opt-hint" id="memberHint">银金钻享 9 折（至高减 500）</div>
+    </div>
+    <div class="seg" id="memberSeg">
+      <button data-m="none" class="on">普通</button>
+      <button data-m="silver">银卡</button>
+      <button data-m="gold">金卡</button>
+      <button data-m="diamond">钻卡</button>
+    </div>
+  </div>
+  <div class="opt-row" id="studentRow">
+    <div>
+      <div class="opt-label">学生认证（体验店）</div>
+      <div class="opt-hint">指定 Pad 机型立减 100 元</div>
+    </div>
+    <div class="toggle" id="studentTgl"></div>
+  </div>
+  <div class="opt-row" id="bundleRow">
+    <div>
+      <div class="opt-label">连带购 Find/Reno 手机</div>
+      <div class="opt-hint" id="bundleHint">配件享连带券直减</div>
+    </div>
+    <div class="toggle" id="bundleTgl"></div>
+  </div>
+  <div class="opt-row">
+    <div>
+      <div class="opt-label">以旧换新抵扣</div>
+      <div class="opt-hint">欧享焕平台旧机回收款直接抵扣</div>
+    </div>
+    <div class="ti-input">
+      <span>¥</span>
+      <input type="number" id="tradeIn" min="0" placeholder="0" inputmode="numeric">
+      <button class="ti-btn" id="tiConfirm">确认</button>
+    </div>
+  </div>
+  <div class="opt-row" id="govRow" style="background:#F0F7F3;border-radius:8px;padding:10px;margin:0 -4px;">
+    <div>
+      <div class="opt-label" style="color:#0B7A5A">政府补贴（自动计算）</div>
+      <div class="opt-hint" id="govHint"></div>
+    </div>
+    <div class="opt-label" id="govVal" style="color:#E63946;font-weight:700;white-space:nowrap"></div>
+  </div>
+</div>
+
+<div class="breakdown">
+  <h3>价格明细</h3>
+  <div id="bd"></div>
+</div>
+
+<div class="perks" id="perksBox" style="display:none">
+  <h3>本机型还可享受</h3>
+  <ul id="perks"></ul>
+</div>
+
+<div class="foot">
+  数据来源：2026 双十一权益一线端表 + 闪促价格表<br>
+  赠品数量有限先到先得；连带券有效期 15 天，一次使用仅限一张
+</div>
+
+<div class="result">
+  <div class="result-inner">
+    <div class="left">
+      <div class="lbl">预估到手价</div>
+      <div class="val"><small>¥</small><span id="finalPrice">--</span></div>
+      <div class="save" id="saveText"></div>
+    </div>
+    <button class="btn" onclick="copyQuote()">复制报价</button>
+  </div>
+</div>
+
+<script>
+const DATA = {
+  phone: [
+    { id:'x10', name:'Find X10', noMemberDiscount:true, specs:[
+      {s:'12GB+256GB', r:5499, f:0, m:5499},
+      {s:'12GB+512GB', r:5999, f:0, m:5999},
+      {s:'16GB+512GB', r:6499, f:0, m:6499},
+      {s:'16GB+1TB', r:7499, f:0, m:7499}
+    ], perks:['购机享行星新品首发专属礼盒 / OPPO Enco R5 / 延长保一年 三选一','花呗 / 分期 / O2O 平台 6/12（部分）期免息','以旧换新基础补贴最高 1200 元；体验店旧机≥500 元，银/金/钻额外补 100/160/200 元']},
+    { id:'x10e', name:'Find X10 E', noMemberDiscount:true, specs:[
+      {s:'12GB+256GB', r:4999, f:500, m:4499},
+      {s:'16GB+512GB', r:5499, f:500, m:4999}
+    ], perks:['购机享行星新品首发专属礼盒 / OPPO Enco R5 / 延长保一年 三选一','花呗 / 分期 / O2O 平台 6/12（部分）期免息','以旧换新基础补贴最高 1200 元；体验店旧机≥500 元，银/金/钻额外补 100/160/200 元']},
+    { id:'x10pm', name:'Find X10 Pro Max', noMemberDiscount:true, specs:[
+      {s:'12GB+512GB', r:7499, f:0, m:7499},
+      {s:'16GB+512GB', r:7999, f:0, m:7999},
+      {s:'16GB+1TB', r:8999, f:0, m:8999}
+    ], perks:['购机享行星新品首发专属礼盒 / OPPO Enco R5 / 延长保一年 三选一','花呗 / 分期 / O2O 平台 6/12（部分）期免息','以旧换新基础补贴最高 1200 元；体验店旧机≥500 元，银/金/钻额外补 100/160/200 元']},
+    { id:'n6', name:'Find N6', specs:[
+      {s:'16+1T 卫星版', r:11999, f:0, m:11499},
+      {s:'16+512', r:10999, f:0, m:10499},
+      {s:'12+256', r:9999, f:1000, m:8499}
+    ], perks:['体验店学生购机赠 20W 充电宝一个','12+256 版本闪促 1000 元']},
+    { id:'x9u', name:'Find X9 Ultra', specs:[
+      {s:'哈苏大师套装 (16+1TB)', r:11999, f:0, m:11499},
+      {s:'卫星通信版 (16+1TB)', r:9499, f:0, m:8999},
+      {s:'16GB+1TB', r:9299, f:0, m:8799},
+      {s:'16GB+512GB', r:8499, f:0, m:7999},
+      {s:'12GB+512GB', r:7999, f:0, m:7499}
+    ], perks:['体验店（含 O2O 团补）/综合门店银金钻九折，至高 500 元']},
+    { id:'x9sp', name:'Find X9s Pro', specs:[
+      {s:'16GB+1TB', r:6999, f:500, m:5999},
+      {s:'16GB+512GB', r:5999, f:500, m:4999},
+      {s:'12GB+512GB', r:5699, f:500, m:4699},
+      {s:'12GB+256GB', r:5299, f:500, m:4299}
+    ], perks:['全渠道闪促 500 元','体验店（含 O2O 团补）/综合门店银金钻九折，至高 500 元']},
+    { id:'15t', name:'一加 15T', specs:[
+      {s:'16+1T', r:5999, f:0, m:5499},
+      {s:'16+512', r:5499, f:0, m:4999},
+      {s:'16+256', r:4899, f:0, m:4409.1}
+    ], perks:['体验店（含 O2O 团补）/综合门店银金钻九折，至高 500 元']},
+    { id:'16', name:'一加 16', noMemberDiscount:true, specs:[
+      {s:'12GB+256GB', r:5999, f:300, m:5699},
+      {s:'16GB+512GB', r:7499, f:300, m:7199}
+    ], perks:['限时闪促 300 元，之后正常享受国补/市补','赠 OPPO Enco R5 耳机（价值 299）+ 一加磁吸冰冰卡 Mini（价值 199）','学生用户加赠菱格双肩包（价值 199）','至高 12 期免息','OPPO 云空间 200GB 两年（价值 298）','以旧换新至高补贴 1400 元','镜头保一年 / 延长保五折购 / 新机权益礼包 / 屏碎保买一年送一年','活动时间 10.12 - 10.31']},
+    { id:'ace6t', name:'一加 Ace 6T', specs:[
+      {s:'16+512G', r:4299, f:0, m:3869.1},
+      {s:'16+256G', r:3599, f:0, m:3239.1}
+    ], perks:['体验店（含 O2O 团补）/综合门店银金钻九折，至高 500 元']},
+    { id:'ace6u', name:'一加 Ace 6 至尊版', noMemberDiscount:true, specs:[
+      {s:'12+512', r:4299, f:0, m:4299},
+      {s:'16+512', r:4599, f:0, m:4599}
+    ], perks:['无银金钻 9 折等会员优惠']},
+    { id:'t6v', name:'一加 Turbo 6V', specs:[
+      {s:'12+512', r:2899, f:0, m:2609.1},
+      {s:'12+256', r:2599, f:0, m:2339.1}
+    ], perks:['体验店（含 O2O 团补）/综合门店银金钻九折，至高 500 元']},
+    { id:'t6', name:'一加 Turbo 6', noMemberDiscount:true, specs:[
+      {s:'16+256', r:3099, f:0, m:3099},
+      {s:'12+512', r:3299, f:0, m:3299},
+      {s:'16+512', r:3599, f:0, m:3599}
+    ], perks:['无银金钻 9 折等会员优惠']},
+    { id:'t6xp', name:'一加 Turbo 6X Pro', noMemberDiscount:true, specs:[
+      {s:'8+256', r:2099, f:0, m:2099},
+      {s:'12+256', r:2399, f:0, m:2399}
+    ], perks:['无银金钻 9 折等会员优惠']},
+    { id:'ace6u', name:'一加 Ace 6 至尊版', noMemberDiscount:true, specs:[
+      {s:'12+512', r:4299, f:0, m:4299},
+      {s:'16+512', r:4599, f:0, m:4599}
+    ], perks:['无银金钻 9 折等会员优惠']},
+    { id:'r16t', name:'Reno 16T', noMemberDiscount:true, fLabel:'优惠', specs:[
+      {s:'12+256', r:3699, f:200, m:3499},
+      {s:'16+512', r:4499, f:200, m:4299}
+    ], perks:['限时优惠 200 元']},
+    { id:'r16pro', name:'Reno 16 Pro', noMemberDiscount:true, specs:[
+      {s:'12+512', r:4899, f:0, m:4899},
+      {s:'16+512', r:5299, f:0, m:5299}
+    ], perks:['无银金钻 9 折等会员优惠']},
+    { id:'r15c', name:'Reno 15C', noMemberDiscount:true, specs:[
+      {s:'12+256', r:2999, f:0, m:2999},
+      {s:'12+512', r:3399, f:0, m:3399}
+    ], perks:['享国补优惠，无银金钻 9 折等其他会员优惠']},
+    { id:'a7pm', name:'A7 Pro Max', noMemberDiscount:true, specs:[
+      {s:'12+256', r:2699, f:0, m:2699},
+      {s:'12+512', r:2999, f:0, m:2999}
+    ], perks:['享国补优惠，无其他会员优惠']}
+  ],
+  pad: [
+    { id:'p5p', name:'Pad 5 Pro', bundleDiscount:100, specs:[
+      {s:'12+256', r:4499, f:0, m:4049.1},
+      {s:'16+512', r:5499, f:0, m:4949.1}
+    ], student:true, perks:['10.8-10.31 购指定机型赠价值 399 元 Pencil 3','学生经认证后指定机型立减 100 元（体验店）','银金钻会员 9 折','买 Find/Reno 系列连带购立减 100 元（连带券 15 天有效，每人限 1 张平板券）']},
+    { id:'pmini', name:'Pad mini', bundleDiscount:100, specs:[
+      {s:'12+256', r:3999, f:0, m:3599.1}
+    ], student:true, perks:['学生经认证后指定机型立减 100 元（体验店）','银金钻会员 9 折','买 Find/Reno 系列连带购立减 100 元（连带券 15 天有效，每人限 1 张 Mini 券）']},
+    { id:'pminir', name:'Pad mini 柔光版', bundleDiscount:100, specs:[
+      {s:'12+256', r:4499, f:0, m:4049.1},
+      {s:'12+512', r:4999, f:0, m:4499.1}
+    ], student:true, perks:['学生经认证后指定机型立减 100 元（体验店）','银金钻会员 9 折','买 Find/Reno 系列连带购立减 100 元（连带券 15 天有效，每人限 1 张 Mini 券）']},
+    { id:'p6', name:'Pad 6', bundleDiscount:100, specs:[
+      {s:'8+256', r:3799, f:0, m:3419.1},
+      {s:'16+512', r:4599, f:0, m:4139.1}
+    ], student:true, perks:['10.8-10.31 购指定机型赠价值 399 元 OPPO Pencil 2 / 一加智能手写笔','学生经认证后指定机型立减 100 元（体验店）','银金钻会员 9 折','买 Find/Reno 系列连带购立减 100 元（连带券 15 天有效，每人限 1 张平板券）']},
+    { id:'p6r', name:'Pad 6 柔光版', bundleDiscount:100, specs:[
+      {s:'8+256', r:4099, f:0, m:3689.1},
+      {s:'12+256', r:4499, f:0, m:4049.1}
+    ], student:true, perks:['学生经认证后指定机型立减 100 元（体验店）','银金钻会员 9 折','买 Find/Reno 系列连带购立减 100 元（连带券 15 天有效，每人限 1 张平板券）']},
+    { id:'pai5', name:'Pad Air 5', bundleDiscount:100, noMemberDiscount:true, specs:[
+      {s:'8+256', r:2899, f:500, m:2399},
+      {s:'12+256', r:3299, f:500, m:2799}
+    ], perks:['闪促立减 500 元','买 Find/Reno 系列连带购立减 100 元（连带券 15 天有效）']},
+    { id:'pai5r', name:'Pad Air 5 柔光版', bundleDiscount:100, noMemberDiscount:true, specs:[
+      {s:'8+256', r:3099, f:500, m:2599},
+      {s:'12+256', r:3499, f:500, m:2999}
+    ], perks:['闪促立减 500 元','买 Find/Reno 系列连带购立减 100 元（连带券 15 天有效）']}
+  ],
+  watch: [
+    { id:'w3', name:'Watch X3', bundleDiscount:100, specs:[
+      {s:'引力黑', r:2399, f:0, m:2159.1},
+      {s:'寰月钛 / 寰宇星橙 / 无限钛', r:2599, f:0, m:2339.1}
+    ], perks:['银金钻会员 9 折','买 Find/Reno 系列连带购本款立减 100 元（连带券 15 天有效，每人限 1 张）']},
+    { id:'w3m', name:'Watch X3 Mini', bundleDiscount:100, specs:[
+      {s:'摩卡棕 / 星光银', r:1999, f:0, m:1799.1},
+      {s:'粉黛海 / 高光金', r:2499, f:0, m:2249.1}
+    ], perks:['银金钻会员 9 折','买 Find/Reno 系列连带购本款立减 100 元（连带券 15 天有效，每人限 1 张）']},
+    { id:'ws', name:'Watch S', specs:[
+      {s:'跃动绿茵', r:1299, f:0, m:1169.1},
+      {s:'律动银 / 竞速黑', r:1099, f:0, m:989.1}
+    ], perks:['银金钻会员 9 折']},
+    { id:'ws2', name:'Watch S2', bundleDiscount:100, noMemberDiscount:true, specs:[
+      {s:'跃动橙 / 薄雾粉 / 山影灰', r:1599, f:100, m:1499}
+    ], perks:['体验店购机赠价值 249 元表带（数量有限先到先得）','买 Find/Reno 系列连带购立减 100 元（连带券 15 天有效，每人限 1 张）','以旧换新：银/金/钻加补 50/80/100 元（旧机≥100 元）']}
+  ],
+  buds: [
+    { id:'ea5s', name:'Enco Air5s（星光版）', bundleDiscount:30, specs:[
+      {s:'星光版', r:299, f:0, m:269.1}
+    ], perks:['银金钻会员 9 折','买 Find/Reno 系列连带购本款立减 30 元（连带券 15 天有效，每人限 1 张 30 元音频券）']},
+    { id:'ec2', name:'Enco Clip2', bundleDiscount:50, specs:[
+      {s:'高光金 / 深空灰 / 晨雾白', r:799, f:0, m:719.1}
+    ], perks:['银金钻会员 9 折','买 Find/Reno 系列连带购本款立减 50 元（连带券 15 天有效，每人限 1 张 50 元音频券）']},
+    { id:'ex4', name:'Enco X4', bundleDiscount:50, noMemberDiscount:true, specs:[
+      {s:'柔白 / 钛灰 / 粉金', r:1199, f:100, m:1099}
+    ], perks:['买 Find/Reno 系列连带购立减 50 元（连带券 15 天有效，每人限 1 张）','以旧换新：银金钻加补 50 元（旧机≥50 元）','3 期分期免息']},
+    { id:'ef4', name:'Enco Free4', bundleDiscount:30, noMemberDiscount:true, specs:[
+      {s:'标准版', r:399, f:0, m:399}
+    ], perks:['买 Find/Reno 系列连带购本款立减 30 元（连带券 15 天有效，每人限 1 张 30 元音频券）']}
+  ]
+};
+
+const CAT_NAME = { phone:'手机', pad:'平板', watch:'手表', buds:'耳机' };
+
+const state = { cat:'phone', modelIdx:0, specIdx:0, member:'none', student:false, bundle:false, tradeIn:0 };
+
+function fmt(n){ return (Math.round(n*10)/10).toLocaleString('zh-CN',{maximumFractionDigits:1}); }
+
+function renderTabs(){
+  const el = document.getElementById('tabs');
+  el.innerHTML = Object.keys(DATA).map(k=>`<div class="tab ${state.cat===k?'on':''}" onclick="setCat('${k}')">${CAT_NAME[k]}</div>`).join('');
+}
+function setCat(c){ state.cat=c; state.modelIdx=0; state.specIdx=0; renderAll(); }
+
+function renderModels(){
+  const list = DATA[state.cat];
+  document.getElementById('models').innerHTML = list.map((m,i)=>`<div class="chip ${i===state.modelIdx?'on':''}" onclick="setModel(${i})">${m.name}</div>`).join('');
+}
+function setModel(i){ state.modelIdx=i; state.specIdx=0; renderAll(); }
+
+function renderSpecs(){
+  const m = DATA[state.cat][state.modelIdx];
+  const fLabel = m.fLabel || '闪促';
+  document.getElementById('specs').innerHTML = m.specs.map((sp,i)=>{
+    const after = sp.r - sp.f;
+    const priceHtml = sp.f>0
+      ? `<span class="old">¥${fmt(sp.r)}</span><span class="new">¥${fmt(after)}</span><span class="flash-tag">${fLabel} -${sp.f}</span>`
+      : `<span class="new no-flash">¥${fmt(sp.r)}</span>`;
+    return `<div class="spec ${i===state.specIdx?'on':''}" onclick="setSpec(${i})">
+      <div class="name">${sp.s}</div>
+      <div class="price">${priceHtml}</div>
+    </div>`;
+  }).join('');
+}
+function setSpec(i){ state.specIdx=i; renderAll(); }
+
+function renderMember(){
+  const m = DATA[state.cat][state.modelIdx];
+  const btns = document.querySelectorAll('#memberSeg button');
+  btns.forEach(b=>{
+    b.classList.toggle('on', b.dataset.m===state.member);
+    b.disabled = false;
+    b.style.opacity = 1;
+  });
+  document.getElementById('memberHint').textContent = m.noMemberDiscount ? '不享9折；选银/金/钻可叠加以旧换新会员补贴' : '银金钻享 9 折（至高减 500）';
+  btns.forEach(b=>{
+    b.onclick = ()=>{ state.member=b.dataset.m; renderAll(); };
+  });
+}
+
+function renderStudent(){
+  const m = DATA[state.cat][state.modelIdx];
+  const row = document.getElementById('studentRow');
+  const tgl = document.getElementById('studentTgl');
+  if(!m.student){ row.style.opacity=.4; tgl.classList.add('disabled'); state.student=false; }
+  else { row.style.opacity=1; tgl.classList.remove('disabled'); }
+  tgl.classList.toggle('on', state.student && m.student);
+  tgl.onclick = ()=>{ if(m.student){ state.student=!state.student; renderAll(); } };
+}
+
+function renderTradeIn(){
+  const el = document.getElementById('tradeIn');
+  const btn = document.getElementById('tiConfirm');
+  el.oninput = ()=>{ state.tradeIn = Math.max(0, parseFloat(el.value)||0); };
+  btn.onclick = ()=>{ state.tradeIn = Math.max(0, parseFloat(el.value)||0); renderAll(); };
+}
+
+function calc(){
+  const m = DATA[state.cat][state.modelIdx];
+  const sp = m.specs[state.specIdx];
+  const base = (state.member==='none' || m.noMemberDiscount) ? (sp.r - sp.f) : sp.m;
+  const studDed = (state.student && m.student) ? 100 : 0;
+  const bundleDed = (state.bundle && m.bundleDiscount) ? m.bundleDiscount : 0;
+  const ti = state.tradeIn || 0;
+  // 以旧换新额外补贴按品类分档叠加
+  let tiBaseBonus = 0, tiMemberBonus = 0, tiExtraBonus = 0;
+  // 手机：仅 Find X10 系列（X10/X10E/X10 Pro Max）有额外补贴
+  const isFindPhone = state.cat==='phone' && ['x10','x10e','x10pm'].includes(m.id);
+  if(isFindPhone){
+    // 基础档位补贴仅 X10 系列
+    if(m.id==='x10' || m.id==='x10e' || m.id==='x10pm'){
+      if(ti >= 5000) tiBaseBonus = 1200;
+      else if(ti >= 2500) tiBaseBonus = 400;
+      else if(ti >= 1200) tiBaseBonus = 200;
+      else if(ti >= 500) tiBaseBonus = 100;
+    }
+    // 会员补贴：旧机>500，银/金/钻 100/160/200
+    if(ti > 500){
+      if(state.member==='silver') tiMemberBonus = 100;
+      else if(state.member==='gold') tiMemberBonus = 160;
+      else if(state.member==='diamond') tiMemberBonus = 200;
+    }
+    // X10 / X10 Pro Max 额外补贴：旧机>200
+    if(ti > 200){
+      if(m.id === 'x10') tiExtraBonus = 200;
+      else if(m.id === 'x10pm') tiExtraBonus = 300;
+    }
+  }
+  // 耳机：仅 Enco X4，旧机≥50，银/金/钻都补50
+  if(state.cat==='buds' && m.id==='ex4' && ti >= 50){
+    if(state.member==='silver' || state.member==='gold' || state.member==='diamond') tiMemberBonus = 50;
+  }
+  // 手表：仅 Watch S2，旧机≥100，银/金/钻补 50/80/100
+  if(state.cat==='watch' && m.id==='ws2' && ti >= 100){
+    if(state.member==='silver') tiMemberBonus = 50;
+    else if(state.member==='gold') tiMemberBonus = 80;
+    else if(state.member==='diamond') tiMemberBonus = 100;
+  }
+  const tiBonus = tiBaseBonus + tiMemberBonus + tiExtraBonus;
+  // 政府补贴基数：以旧换新是平台另外给用户的钱，不计入实付价
+  const priceForGov = base - studDed;
+  // 政府补贴：耳机不参与；一加16已含政策补贴不再重复算
+  let gov = { type:'none', amount:0, voucher:0, label:'', note:'' };
+  if(!m.noGovSubsidy && state.cat !== 'buds' && priceForGov > 0){
+    if(priceForGov < 6000){
+      const sub = Math.round(Math.min(priceForGov * 0.15, 500) * 10) / 10;
+      gov = { type:'gb', amount: sub, voucher:0, label:`国补 15%`, note:`按实付价 15% 补贴，单件上限 500 元（现金直减）` };
+    } else {
+      const cash = Math.round(Math.min(priceForGov * 0.05, 500) * 10) / 10;
+      const voucher = Math.round(Math.min(priceForGov * 0.05, 500) * 10) / 10;
+      gov = { type:'sb', amount: cash, voucher: voucher, label:`市补现金 5%`, note:`西安市补 5%（现金，上限 500）+ 消费券 5%（上限 500，到账后可抵用）` };
+    }
+  } else if(state.cat === 'buds'){
+    gov = { type:'na', amount:0, voucher:0, label:'耳机不参与', note:'国补/市补仅覆盖手机、平板、手表' };
+  } else if(m.noGovSubsidy){
+    gov = { type:'na', amount:0, voucher:0, label:'已含政策补贴', note:'本机型优惠已含国补/市补，不重复享受' };
+  }
+  const final = priceForGov - gov.amount - bundleDed - ti - tiBonus;
+  return {m, sp, base, studDed, bundleDed, ti, tiBonus, tiBaseBonus, tiMemberBonus, tiExtraBonus, priceForGov, gov, final, retail: sp.r};
+}
+
+function renderBreakdown(){
+  const {sp, base, studDed, bundleDed, ti, tiBonus, tiBaseBonus, tiMemberBonus, tiExtraBonus, final, retail, gov, m} = calc();
+  const fLabel = m.fLabel || '闪促';
+  const lines = [];
+  lines.push(`<div class="bd-row"><span>零售价</span><span>¥${fmt(retail)}</span></div>`);
+  if(sp.f>0) lines.push(`<div class="bd-row deduct"><span>${fLabel}优惠</span><span>- ¥${fmt(sp.f)}</span></div>`);
+  if(state.member!=='none' && !m.noMemberDiscount){
+    const disc = (sp.r - sp.f) - sp.m;
+    lines.push(`<div class="bd-row deduct"><span>${state.member==='silver'?'银卡':state.member==='gold'?'金卡':'钻卡'} 9 折</span><span>- ¥${fmt(disc)}</span></div>`);
+  }
+  if(studDed>0) lines.push(`<div class="bd-row deduct"><span>学生认证立减</span><span>- ¥${studDed}</span></div>`);
+  if(bundleDed>0) lines.push(`<div class="bd-row deduct"><span>连带券（购 Find/Reno 手机）</span><span>- ¥${bundleDed}</span></div>`);
+  if(gov.type==='gb') lines.push(`<div class="bd-row deduct"><span>国家补贴 15%（现金）</span><span>- ¥${fmt(gov.amount)}</span></div>`);
+  if(gov.type==='sb'){
+    lines.push(`<div class="bd-row deduct"><span>西安市补 5%（现金）</span><span>- ¥${fmt(gov.amount)}</span></div>`);
+    lines.push(`<div class="bd-row" style="color:#999;font-size:12px"><span>西安市消费券 5%（到账后可抵）</span><span>¥${fmt(gov.voucher)}（不抵现金）</span></div>`);
+  }
+  if(gov.type==='na' && state.cat==='buds') lines.push(`<div class="bd-row" style="color:#999"><span>政府补贴</span><span>耳机不参与</span></div>`);
+  if(gov.type==='na' && m.noGovSubsidy) lines.push(`<div class="bd-row" style="color:#999"><span>政府补贴</span><span>已含在优惠中</span></div>`);
+  if(ti>0) lines.push(`<div class="bd-row deduct"><span>以旧换新抵扣（平台另付）</span><span>- ¥${fmt(ti)}</span></div>`);
+  if(tiBaseBonus>0) lines.push(`<div class="bd-row deduct"><span>以旧换新基础档位补贴</span><span>- ¥${tiBaseBonus}</span></div>`);
+  if(tiMemberBonus>0) lines.push(`<div class="bd-row deduct"><span>会员以旧换新补贴（${state.member==='silver'?'银卡':state.member==='gold'?'金卡':'钻卡'}）</span><span>- ¥${tiMemberBonus}</span></div>`);
+  if(tiExtraBonus>0) lines.push(`<div class="bd-row deduct"><span>X10 系列额外补贴</span><span>- ¥${tiExtraBonus}</span></div>`);
+  lines.push(`<div class="bd-row total"><span>预估到手价</span><span>¥${fmt(final)}</span></div>`);
+  document.getElementById('bd').innerHTML = lines.join('');
+}
+
+function renderBundle(){
+  const m = DATA[state.cat][state.modelIdx];
+  const row = document.getElementById('bundleRow');
+  const tgl = document.getElementById('bundleTgl');
+  const hint = document.getElementById('bundleHint');
+  if(!m.bundleDiscount){
+    row.style.opacity = .4;
+    tgl.classList.add('disabled');
+    state.bundle = false;
+    hint.textContent = '该机型无连带券';
+  } else {
+    row.style.opacity = 1;
+    tgl.classList.remove('disabled');
+    hint.textContent = `连带购 Find/Reno 手机立减 ¥${m.bundleDiscount}`;
+  }
+  tgl.classList.toggle('on', state.bundle && !!m.bundleDiscount);
+  tgl.onclick = ()=>{ if(m.bundleDiscount){ state.bundle=!state.bundle; renderAll(); } };
+}
+
+function renderGovRow(){
+  const {gov} = calc();
+  const row = document.getElementById('govRow');
+  const hint = document.getElementById('govHint');
+  const val = document.getElementById('govVal');
+  if(gov.type==='na'){
+    row.style.display='none'; return;
+  }
+  row.style.display='flex';
+  hint.textContent = gov.note;
+  if(gov.type==='gb') val.textContent = `国补 -¥${fmt(gov.amount)}`;
+  else if(gov.type==='sb') val.textContent = `市补 -¥${fmt(gov.amount)}（券¥${fmt(gov.voucher)}）`;
+}
+
+function renderPerks(){
+  const m = DATA[state.cat][state.modelIdx];
+  const box = document.getElementById('perksBox');
+  if(!m.perks || !m.perks.length){ box.style.display='none'; return; }
+  box.style.display='block';
+  document.getElementById('perks').innerHTML = m.perks.map(p=>`<li>${p}</li>`).join('');
+}
+
+function renderResult(){
+  const {final, retail, gov} = calc();
+  document.getElementById('finalPrice').textContent = fmt(final);
+  const saved = retail - final;
+  document.getElementById('saveText').textContent = saved>0 ? `已优惠 ¥${fmt(saved)}` : '';
+}
+
+function renderAll(){
+  renderTabs(); renderModels(); renderSpecs(); renderMember(); renderStudent(); renderBundle(); renderTradeIn(); renderGovRow();
+  renderBreakdown(); renderPerks(); renderResult();
+}
+
+function copyQuote(){
+  const {m, sp, studDed, bundleDed, ti, tiBonus, final, retail, gov} = calc();
+  const memName = state.member==='none'?'普通顾客':({silver:'银卡会员',gold:'金卡会员',diamond:'钻卡会员'})[state.member];
+  let txt = `【双十一报价】${m.name} ${sp.s}\n`;
+  txt += `零售价：¥${fmt(retail)}\n`;
+  if(sp.f>0) txt += `闪促：-¥${sp.f}\n`;
+  txt += `身份：${memName}\n`;
+  if(state.member!=='none' && !m.noMemberDiscount) txt += `会员折扣：-¥${fmt((sp.r-sp.f)-sp.m)}\n`;
+  if(studDed>0) txt += `学生立减：-¥${studDed}\n`;
+  if(bundleDed>0) txt += `连带券：-¥${bundleDed}\n`;
+  if(ti>0) txt += `以旧换新：-¥${fmt(ti)}\n`;
+  if(tiBonus>0) txt += `以旧换新额外补贴：-¥${tiBonus}\n`;
+  if(gov.type==='gb') txt += `国家补贴：-¥${fmt(gov.amount)}\n`;
+  if(gov.type==='sb') txt += `西安市补（现金）：-¥${fmt(gov.amount)}（另有消费券¥${fmt(gov.voucher)}）\n`;
+  txt += `——————————\n预估到手价：¥${fmt(final)}`;
+  navigator.clipboard.writeText(txt).then(()=>{
+    alert('报价已复制，可直接发给客户');
+  }).catch(()=>{
+    prompt('复制以下报价：', txt);
+  });
+}
+
+renderAll();
+</script>
+</body>
+</html>
